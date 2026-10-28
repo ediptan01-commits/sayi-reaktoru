@@ -1,0 +1,46 @@
+
+name: Sayi Reaktoru Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sayi-reaktoru
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Flutter kurulumu
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Android dosyalarini olustur
+        run: flutter create --platforms=android --org=com.teknolojix .
+
+      - name: Paketleri yukle
+        run: flutter pub get
+
+      - name: Testleri calistir
+        run: flutter test
+
+      - name: APK olustur
+        run: flutter build apk --debug
+
+      - name: APK dosyasini kaydet
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sayi-Reaktoru-APK
+          path: sayi-reaktoru/build/app/outputs/flutter-apk/app-debug.apk
